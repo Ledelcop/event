@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>送舊典禮｜報名表單</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A96E;
+    --gold-light: #E8D5A3;
+    --gold-dark: #8B6914;
+    --cream: #FAF6EE;
+    --dark: #110E07;
+    --card: #1C1608;
+    --muted: #8A7650;
+    --border: rgba(201,169,110,0.2);
+    --red: #E07070;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--dark); color: var(--cream); font-family: 'Noto Serif TC', serif; min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 15% 10%, rgba(201,169,110,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 90%, rgba(201,169,110,0.05) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 780px; margin: 0 auto; padding: 56px 24px 100px; position: relative; z-index: 1; }
+
+  /* ── Header ── */
+  header { text-align: center; margin-bottom: 36px; animation: fadeDown 0.8s ease both; }
+  .event-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.4em; color: var(--gold); text-transform: uppercase; margin-bottom: 18px; }
+  header h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); font-weight: 900; line-height: 1.15; margin-bottom: 14px; }
+  header h1 em { color: var(--gold); font-style: normal; }
+  .ornament { display: flex; align-items: center; gap: 14px; max-width: 280px; margin: 18px auto; }
+  .ornament::before, .ornament::after { content: ''; flex: 1; height: 1px; }
+  .ornament::before { background: linear-gradient(90deg, transparent, var(--gold-dark)); }
+  .ornament::after  { background: linear-gradient(90deg, var(--gold-dark), transparent); }
+  .subtitle { color: var(--muted); font-size: 0.88rem; letter-spacing: 0.07em; }
+
+  /* ── Notice Card ── */
+  .notice-card {
+    background: linear-gradient(135deg, rgba(201,169,110,0.1), rgba(201,169,110,0.04));
+    border: 1px solid rgba(201,169,110,0.4);
+    border-radius: 14px;
+    padding: 32px 36px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.15s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .notice-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .notice-top {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px;
+  }
+  .notice-badge {
+    font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em;
+    color: var(--dark); background: var(--gold);
+    padding: 3px 10px; border-radius: 20px; flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .notice-title {
+    font-size: 1.05rem; font-weight: 700; color: var(--gold-light); letter-spacing: 0.05em;
+  }
+  .notice-body {
+    font-size: 0.92rem; color: rgba(250,246,238,0.82); line-height: 2;
+    margin-bottom: 22px;
+  }
+  .notice-body p { margin-bottom: 4px; }
+  .info-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 22px;
+  }
+  @media(max-width:560px) { .info-grid { grid-template-columns: 1fr; } }
+  .info-item {
+    background: rgba(201,169,110,0.08);
+    border: 1px solid rgba(201,169,110,0.2);
+    border-radius: 10px; padding: 14px 16px;
+    text-align: center;
+  }
+  .info-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+  .info-value { font-size: 0.88rem; color: var(--gold-light); font-weight: 600; line-height: 1.5; }
+  .notice-reminder {
+    background: rgba(201,169,110,0.07);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 0.84rem; color: rgba(250,246,238,0.75); line-height: 1.7;
+  }
+  .notice-reminder strong { color: var(--gold); }
+
+  /* ── Progress ── */
+  .progress-bar { display: flex; align-items: center; margin-bottom: 36px; animation: fadeUp 0.6s 0.25s ease both; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--card); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); transition: all 0.3s; }
+  .step.active .step-circle { border-color: var(--gold); background: var(--gold); color: var(--dark); font-weight: 700; box-shadow: 0 0 16px rgba(201,169,110,0.4); }
+  .step.done .step-circle { border-color: var(--gold-dark); background: rgba(201,169,110,0.15); color: var(--gold); }
+  .step-label { font-size: 0.62rem; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; color: var(--muted); text-align: center; }
+  .step.active .step-label { color: var(--gold); }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin-bottom: 22px; }
+
+  /* ── Section ── */
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 32px; margin-bottom: 20px; display: none; animation: fadeUp 0.4s ease both; }
+  .section.visible { display: block; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 22px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 0.82rem; color: var(--gold-light); letter-spacing: 0.05em; margin-bottom: 8px; }
+  label .req { color: var(--gold); margin-left: 3px; }
+  label .hint { color: var(--muted); font-size: 0.72rem; margin-left: 6px; }
+  input[type="text"], input[type="email"], input[type="number"], textarea, select {
+    width: 100%; background: rgba(201,169,110,0.06); border: 1px solid rgba(201,169,110,0.25); border-radius: 8px;
+    color: var(--cream); font-family: 'Noto Serif TC', serif; font-size: 0.95rem; padding: 11px 14px;
+    transition: border-color 0.2s, background 0.2s; outline: none; -webkit-appearance: none; appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A96E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer;
+  }
+  select option { background: #1C1608; color: var(--cream); }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); background: rgba(201,169,110,0.1); }
+  input::placeholder, textarea::placeholder { color: rgba(201,169,110,0.3); }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.7; }
+  .err { font-size: 0.75rem; color: var(--red); margin-top: 5px; display: none; }
+  .err.show { display: block; }
+
+  /* ── Toggle ── */
+  .toggle-group { display: flex; gap: 10px; }
+  .toggle-btn { flex: 1; padding: 10px; background: rgba(201,169,110,0.06); border: 1px solid rgba(201,169,110,0.25); border-radius: 8px; color: var(--muted); font-family: 'Noto Serif TC', serif; font-size: 0.9rem; text-align: center; cursor: pointer; transition: all 0.2s; user-select: none; }
+  .toggle-btn.active { background: rgba(201,169,110,0.18); border-color: var(--gold); color: var(--gold); }
+  .cond { display: none; margin-top: 16px; }
+  .cond.show { display: block; }
+
+  /* ── Seat Map ── */
+  .stage { background: linear-gradient(135deg,rgba(201,169,110,0.12),rgba(201,169,110,0.04)); border: 1px solid rgba(201,169,110,0.35); border-radius: 8px; text-align: center; padding: 10px; margin-bottom: 24px; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; }
+  .seat-map { display: flex; flex-direction: column; gap: 8px; }
+  .row-wrap { display: flex; align-items: center; gap: 6px; }
+  .row-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); width: 20px; text-align: right; flex-shrink: 0; }
+  .seats-row { display: flex; gap: 5px; }
+  .seat { width: 36px; height: 36px; border-radius: 6px; border: 1.5px solid rgba(201,169,110,0.45); background: rgba(201,169,110,0.07); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.6rem; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; user-select: none; position: relative; }
+  .seat:hover:not(.taken):not(.selected) { background: rgba(201,169,110,0.2); border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(201,169,110,0.25); }
+  .seat.selected { background: var(--gold); border-color: var(--gold-dark); color: var(--dark); font-weight: 700; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(201,169,110,0.5); }
+  .seat.taken { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06); color: rgba(255,255,255,0.13); cursor: not-allowed; }
+  .seat::after { content: attr(data-label); position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: var(--dark); color: var(--gold); font-size: 0.58rem; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 10; }
+  .seat:hover::after { opacity: 1; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 18px; justify-content: center; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--muted); }
+  .legend-dot { width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid; }
+  .legend-dot.empty { background: rgba(201,169,110,0.07); border-color: rgba(201,169,110,0.45); }
+  .legend-dot.sel   { background: var(--gold); border-color: var(--gold-dark); }
+  .legend-dot.tkn   { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06); }
+  .seat-note { margin-top: 14px; font-size: 0.78rem; color: var(--muted); letter-spacing: 0.04em; }
+  .seat-badge { margin-top: 10px; padding: 12px 16px; background: rgba(201,169,110,0.07); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; color: var(--gold-light); min-height: 44px; }
+  .seat-tag { display: inline-flex; align-items: center; background: var(--gold); color: var(--dark); font-family: 'DM Mono', monospace; font-size: 0.72rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; margin-left: 8px; }
+
+  /* ── Nav ── */
+  .nav-btns { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-back { flex: 1; padding: 13px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: var(--muted); font-family: 'Noto Serif TC', serif; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+  .btn-back:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-next { flex: 2; padding: 13px; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); border: none; border-radius: 10px; color: var(--dark); font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 18px rgba(201,169,110,0.3); }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(201,169,110,0.45); }
+  .btn-next:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ── Review ── */
+  .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:520px) { .review-grid { grid-template-columns: 1fr; } }
+  .review-item { background: rgba(201,169,110,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .review-item.full { grid-column: 1 / -1; }
+  .review-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 5px; }
+  .review-value { font-size: 0.9rem; color: var(--cream); line-height: 1.6; }
+  .review-value.hl { color: var(--gold); font-weight: 700; }
+
+  /* ── Loading ── */
+  .loading-overlay { position: fixed; inset: 0; background: rgba(10,8,3,0.88); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(6px); }
+  .loading-overlay.show { opacity: 1; pointer-events: all; }
+  .spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
+  .loading-overlay p { color: var(--gold-light); letter-spacing: 0.1em; font-size: 0.9rem; }
+
+  /* ── Modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,8,3,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(6px); padding: 20px; }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal { background: var(--card); border: 1px solid rgba(201,169,110,0.35); border-radius: 18px; padding: 40px 36px; max-width: 500px; width: 100%; text-align: center; transform: scale(0.88); transition: transform 0.35s cubic-bezier(.34,1.56,.64,1); max-height: 90vh; overflow-y: auto; }
+  .modal-overlay.show .modal { transform: scale(1); }
+  .modal-icon { font-size: 3rem; margin-bottom: 16px; }
+  .modal h2 { font-size: 1.5rem; color: var(--gold); margin-bottom: 8px; }
+  .modal .modal-sub { color: var(--muted); font-size: 0.88rem; line-height: 1.8; margin-bottom: 24px; }
+
+  /* Confirmation letter inside modal */
+  .confirm-letter {
+    background: rgba(201,169,110,0.05);
+    border: 1px solid rgba(201,169,110,0.25);
+    border-radius: 12px;
+    padding: 24px 26px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .confirm-letter .letter-header {
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.25em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .confirm-letter .letter-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .confirm-letter p { font-size: 0.88rem; color: rgba(250,246,238,0.85); line-height: 2; margin-bottom: 6px; }
+  .confirm-letter p:last-child { margin-bottom: 0; }
+  .confirm-letter .highlight { color: var(--gold); font-weight: 700; }
+  .confirm-letter .divider-sm { height: 1px; background: var(--border); margin: 14px 0; }
+  .confirm-letter .event-block { margin-bottom: 12px; }
+  .confirm-letter .event-row { display: flex; gap: 10px; font-size: 0.86rem; line-height: 2; }
+  .confirm-letter .event-row .ev-label { color: var(--muted); min-width: 72px; flex-shrink: 0; }
+  .confirm-letter .event-row .ev-val { color: var(--cream); }
+  .confirm-letter .reminder-box {
+    background: rgba(201,169,110,0.08);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    margin-top: 14px;
+    font-size: 0.82rem; color: rgba(250,246,238,0.75); line-height: 1.8;
+  }
+  .confirm-letter .reminder-box strong { color: var(--gold); }
+  .confirm-letter .sign { margin-top: 16px; font-size: 0.84rem; color: var(--muted); text-align: right; }
+
+  .modal-close { background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.3); border-radius: 8px; color: var(--gold); font-family: 'Noto Serif TC', serif; font-size: 0.92rem; padding: 11px 32px; cursor: pointer; transition: background 0.2s; }
+  .modal-close:hover { background: rgba(201,169,110,0.22); }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media(max-width:520px) { .seat { width:26px; height:26px; font-size:0.5rem; } .seats-row { gap:3px; } .section { padding:22px 16px; } .modal { padding:28px 20px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="event-label">✦ 2025 Farewell Ceremony ✦</div>
+    <h1>送舊<em>典禮</em><br>報名表單</h1>
+    <div class="ornament">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 0.5L8.3 5.7L13.5 7L8.3 8.3L7 13.5L5.7 8.3L0.5 7L5.7 5.7Z" fill="#C9A96E"/>
+      </svg>
+    </div>
+    <p class="subtitle">物理治療學系學會活動部</p>
+  </header>
+
+  <!-- Notice Card -->
+  <div class="notice-card">
+    <div class="notice-top">
+      <div class="notice-badge">活動通告</div>
+      <div class="notice-title">恭請學長學姐出席</div>
+    </div>
+    <div class="notice-body">
+      <p>本屆物理治療系學會活動部將於 2025 年 6 月 8 日（禮拜日），為大四生們舉辦送舊活動，特此表單恭請學長學姐們出席。活動訊息如下：</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">活動日期</div>
+        <div class="info-value">2025 年 6 月 7 日<br>（星期日）</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">入場時間</div>
+        <div class="info-value">13:30 — 14:00</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">活動地點</div>
+        <div class="info-value">醫學院<br>第四講堂</div>
+      </div>
+    </div>
+    <div class="notice-reminder">
+      活動當天記得前往<strong>櫃檯簽到</strong>及<strong>領取送舊禮物</strong>，非常感謝。
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="step active" id="si1"><div class="step-circle">01</div><div class="step-label">基本資料</div></div>
+    <div class="step-line"></div>
+    <div class="step" id="si2"><div class="step-circle">02</div><div class="step-label">參加資訊</div></div>
+    <div class="step-line"></div>
+    <div class="step" id="si3"><div class="step-circle">03</div><div class="step-label">選擇座位</div></div>
+    <div class="step-line"></div>
+    <div class="step" id="si4"><div class="step-circle">04</div><div class="step-label">確認送出</div></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="section visible" id="p1">
+    <div class="section-title">01 ── 基本資料</div>
+    <div class="field-row">
+      <div class="field">
+        <label>姓名 <span class="req">*</span></label>
+        <input type="text" id="f-name" placeholder="請輸入姓名">
+        <div class="err" id="e-name">請輸入姓名</div>
+      </div>
+      <div class="field">
+        <label>電子郵件 <span class="req">*</span></label>
+        <input type="email" id="f-email" placeholder="example@email.com">
+        <div class="err" id="e-email">請輸入有效的電子郵件</div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-next" onclick="goNext(1)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section" id="p2">
+    <div class="section-title">02 ── 參加資訊</div>
+    <div class="field">
+      <label>是否有家屬陪同？ <span class="req">*</span></label>
+      <div class="toggle-group">
+        <div class="toggle-btn" id="fam-y" onclick="setFamily(true)">✔ 是</div>
+        <div class="toggle-btn active" id="fam-n" onclick="setFamily(false)">✘ 否</div>
+      </div>
+    </div>
+    <div class="cond" id="family-cond">
+      <div class="field">
+        <label>家屬人數 <span class="req">*</span></label>
+        <input type="number" id="f-fcount" placeholder="請輸入人數" min="1" max="20">
+        <div class="err" id="e-fcount">請輸入家屬人數（至少 1 人）</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>是否要上台表演？ <span class="req">*</span></label>
+      <div class="toggle-group">
+        <div class="toggle-btn" id="prf-y" onclick="setPerform(true)">✔ 是</div>
+        <div class="toggle-btn active" id="prf-n" onclick="setPerform(false)">✘ 否</div>
+      </div>
+    </div>
+    <div class="cond" id="perform-cond">
+      <div class="field-row">
+        <div class="field">
+          <label>表演項目 <span class="req">*</span></label>
+          <select id="f-ptype">
+            <option value="">請選擇項目</option>
+            <option>歌唱</option>
+            <option>舞蹈</option>
+            <option>樂器演奏</option>
+            <option>戲劇／小品</option>
+            <option>影片播放</option>
+            <option>其他</option>
+          </select>
+          <div class="err" id="e-ptype">請選擇表演項目</div>
+        </div>
+        <div class="field">
+          <label>表演名稱 <span class="req">*</span></label>
+          <input type="text" id="f-pname" placeholder="請輸入表演名稱">
+          <div class="err" id="e-pname">請輸入表演名稱</div>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>特殊需求 <span class="hint">（素食、過敏、輪椅等，可留空）</span></label>
+      <input type="text" id="f-special" placeholder="請輸入特殊需求">
+    </div>
+    <div class="field">
+      <label>想說的話 <span class="hint">（給畢業生或主辦的留言，可留空）</span></label>
+      <textarea id="f-msg" placeholder="在這裡留下您想說的話…"></textarea>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goBack(2)">← 上一步</button>
+      <button class="btn-next" onclick="goNext(2)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="section" id="p3">
+    <div class="section-title">03 ── 選擇座位</div>
+    <div class="stage">▲ &nbsp; 主 桌 ／ 舞 台 方 向 &nbsp; ▲</div>
+    <div class="seat-map" id="seatMap"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot empty"></div>可選擇</div>
+      <div class="legend-item"><div class="legend-dot sel"></div>已選擇</div>
+      <div class="legend-item"><div class="legend-dot tkn"></div>已佔用</div>
+    </div>
+    <div class="seat-note">※ 座位會根據實際空位往前挪動</div>
+    <div class="seat-badge" id="seatBadge">尚未選擇座位</div>
+    <div class="err" id="e-seat">請選擇一個座位</div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goBack(3)">← 上一步</button>
+      <button class="btn-next" onclick="goNext(3)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="section" id="p4">
+    <div class="section-title">04 ── 確認資料</div>
+    <div class="review-grid" id="reviewGrid"></div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goBack(4)">← 修改</button>
+      <button class="btn-next" id="submitBtn" onclick="handleSubmit()">✦ 確認報名</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<div class="loading-overlay" id="loader"><div class="spinner"></div><p>正在提交報名資料…</p></div>
+
+<!-- Success Modal with Confirmation Letter -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <h2>報名成功！</h2>
+    <p class="modal-sub">以下為您的報名確認信，請截圖或保存備用。</p>
+
+    <div class="confirm-letter">
+      <div class="letter-header">確認通知 · Confirmation</div>
+
+      <p>親愛的 <span class="highlight" id="cl-name"></span> 學長／學姐，您好：</p>
+      <p>感謝您報名參加本屆物理治療系學會活動部所舉辦的<strong>送舊典禮</strong>，您的報名已成功登記。</p>
+
+      <div class="divider-sm"></div>
+
+      <p style="color:var(--gold-light); font-size:0.82rem; letter-spacing:0.05em; margin-bottom:8px;">您的報名資訊</p>
+      <div id="cl-reg-info"></div>
+
+      <div class="divider-sm"></div>
+
+      <p style="color:var(--gold-light); font-size:0.82rem; letter-spacing:0.05em; margin-bottom:8px;">活動資訊提醒</p>
+      <div class="event-block">
+        <div class="event-row"><span class="ev-label">活動日期</span><span class="ev-val">2025 年 6 月 7 日（星期日）</span></div>
+        <div class="event-row"><span class="ev-label">入場時間</span><span class="ev-val">13:30 — 14:00</span></div>
+        <div class="event-row"><span class="ev-label">活動地點</span><span class="ev-val">醫學院 第四講堂</span></div>
+        <div class="event-row"><span class="ev-label">您的座位</span><span class="ev-val highlight" id="cl-seat"></span></div>
+      </div>
+
+      <div class="reminder-box">
+        活動當天請前往<strong>櫃檯簽到</strong>並<strong>領取送舊禮物</strong>，請勿忘記。
+      </div>
+
+      <div class="sign">
+        物理治療系學會活動部 敬上<br>
+        <span style="font-size:0.76rem; color:rgba(138,118,80,0.7);">Physical Therapy Student Association</span>
+      </div>
+    </div>
+
+    <button class="modal-close" onclick="closeModal()">✦ 完成</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  ⚠️ 請將 Google Apps Script 部署網址填入下方
+// ══════════════════════════════════════════════════
+const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+
+const ROW_LABELS = ['A','B','C','D'];
+const COLS = 11;
+const TAKEN_INIT = ['A-03','A-07','B-05','B-09','C-02','C-08','D-04'];
+
+let step = 1;
+let selectedSeat = null;
+let hasFamily = false;
+let willPerform = false;
+
+function buildMap() {
+  const map = document.getElementById('seatMap');
+  map.innerHTML = '';
+  ROW_LABELS.forEach(row => {
+    const wrap = document.createElement('div'); wrap.className = 'row-wrap';
+    const lbl  = document.createElement('div'); lbl.className = 'row-label'; lbl.textContent = row;
+    wrap.appendChild(lbl);
+    const rowEl = document.createElement('div'); rowEl.className = 'seats-row';
+    for (let c = 1; c <= COLS; c++) {
+      const id = `${row}-${String(c).padStart(2,'0')}`;
+      const s = document.createElement('div');
+      s.className = 'seat'; s.dataset.id = id; s.dataset.label = id; s.textContent = c;
+      if (TAKEN_INIT.includes(id)) s.classList.add('taken');
+      else s.addEventListener('click', () => clickSeat(id, s));
+      rowEl.appendChild(s);
+    }
+    wrap.appendChild(rowEl); map.appendChild(wrap);
+  });
+}
+
+function clickSeat(id, el) {
+  if (selectedSeat) {
+    const prev = document.querySelector(`.seat[data-id="${selectedSeat}"]`);
+    if (prev) prev.classList.remove('selected');
+  }
+  if (selectedSeat === id) { selectedSeat = null; updateBadge(); return; }
+  selectedSeat = id; el.classList.add('selected'); updateBadge();
+  document.getElementById('e-seat').classList.remove('show');
+}
+
+function updateBadge() {
+  document.getElementById('seatBadge').innerHTML = selectedSeat
+    ? `已選擇座位：<span class="seat-tag">✦ ${selectedSeat}</span>`
+    : '尚未選擇座位';
+}
+
+function setFamily(v) {
+  hasFamily = v;
+  document.getElementById('fam-y').className = 'toggle-btn' + (v?' active':'');
+  document.getElementById('fam-n').className = 'toggle-btn' + (!v?' active':'');
+  document.getElementById('family-cond').className = 'cond' + (v?' show':'');
+  if (!v) document.getElementById('f-fcount').value = '';
+}
+function setPerform(v) {
+  willPerform = v;
+  document.getElementById('prf-y').className = 'toggle-btn' + (v?' active':'');
+  document.getElementById('prf-n').className = 'toggle-btn' + (!v?' active':'');
+  document.getElementById('perform-cond').className = 'cond' + (v?' show':'');
+  if (!v) { document.getElementById('f-ptype').value=''; document.getElementById('f-pname').value=''; }
+}
+
+function updateProgress(s) {
+  for (let i = 1; i <= 4; i++)
+    document.getElementById(`si${i}`).className = 'step'+(i===s?' active':i<s?' done':'');
+}
+
+function goNext(from) {
+  if (!validate(from)) return;
+  if (from === 3) buildReview();
+  document.getElementById(`p${from}`).classList.remove('visible');
+  step = from + 1;
+  document.getElementById(`p${step}`).classList.add('visible');
+  updateProgress(step);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function goBack(from) {
+  document.getElementById(`p${from}`).classList.remove('visible');
+  step = from - 1;
+  document.getElementById(`p${step}`).classList.add('visible');
+  updateProgress(step);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+function showErr(id, show) { document.getElementById(id).classList[show?'add':'remove']('show'); }
+
+function validate(s) {
+  let ok = true;
+  if (s === 1) {
+    if (!val('f-name')) { showErr('e-name',true); ok=false; } else showErr('e-name',false);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('f-email'))) { showErr('e-email',true); ok=false; } else showErr('e-email',false);
+  }
+  if (s === 2) {
+    if (hasFamily && (!val('f-fcount')||parseInt(val('f-fcount'))<1)) { showErr('e-fcount',true); ok=false; } else showErr('e-fcount',false);
+    if (willPerform) {
+      if (!val('f-ptype')) { showErr('e-ptype',true); ok=false; } else showErr('e-ptype',false);
+      if (!val('f-pname')) { showErr('e-pname',true); ok=false; } else showErr('e-pname',false);
+    }
+  }
+  if (s === 3) {
+    if (!selectedSeat) { showErr('e-seat',true); ok=false; } else showErr('e-seat',false);
+  }
+  return ok;
+}
+
+function buildReview() {
+  document.getElementById('reviewGrid').innerHTML = [
+    { label:'姓名',     value: val('f-name') },
+    { label:'電子郵件', value: val('f-email') },
+    { label:'座位',     value: selectedSeat, hl:true },
+    { label:'家屬陪同', value: hasFamily?`是（${val('f-fcount')} 人）`:'否' },
+    { label:'上台表演', value: willPerform?`是｜${val('f-ptype')} · ${val('f-pname')}`:'否' },
+    { label:'特殊需求', value: val('f-special')||'（無）' },
+    { label:'想說的話', value: val('f-msg')||'（無）', full:true },
+  ].map(r=>`<div class="review-item ${r.full?'full':''}">
+    <div class="review-label">${r.label}</div>
+    <div class="review-value ${r.hl?'hl':''}">${r.value}</div>
+  </div>`).join('');
+}
+
+async function handleSubmit() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+
+  const payload = {
+    name: val('f-name'), email: val('f-email'), seat: selectedSeat,
+    seatRow: selectedSeat.split('-')[0], seatCol: parseInt(selectedSeat.split('-')[1]),
+    hasFamily: hasFamily?'是':'否', familyCount: hasFamily?val('f-fcount'):'0',
+    willPerform: willPerform?'是':'否', performType: willPerform?val('f-ptype'):'',
+    performName: willPerform?val('f-pname'):'', specialNeeds: val('f-special'), message: val('f-msg'),
+  };
+
+  document.getElementById('loader').classList.add('show');
+
+  try {
+    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    const seatEl = document.querySelector(`.seat[data-id="${selectedSeat}"]`);
+    if (seatEl) { seatEl.classList.remove('selected'); seatEl.classList.add('taken'); }
+
+    document.getElementById('loader').classList.remove('show');
+
+    // Fill confirmation letter
+    document.getElementById('cl-name').textContent = payload.name;
+    document.getElementById('cl-seat').textContent = payload.seat;
+    document.getElementById('cl-reg-info').innerHTML = `
+      <div class="event-row"><span class="ev-label">姓　　名</span><span class="ev-val">${payload.name}</span></div>
+      <div class="event-row"><span class="ev-label">電子郵件</span><span class="ev-val">${payload.email}</span></div>
+      <div class="event-row"><span class="ev-label">座　　位</span><span class="ev-val highlight">${payload.seat}</span></div>
+      ${hasFamily ? `<div class="event-row"><span class="ev-label">家屬人數</span><span class="ev-val">${payload.familyCount} 人</span></div>` : ''}
+      ${willPerform ? `<div class="event-row"><span class="ev-label">表演節目</span><span class="ev-val">${payload.performType} · ${payload.performName}</span></div>` : ''}
+      ${payload.specialNeeds ? `<div class="event-row"><span class="ev-label">特殊需求</span><span class="ev-val">${payload.specialNeeds}</span></div>` : ''}
+    `;
+    document.getElementById('modal').classList.add('show');
+
+    // Reset
+    ['f-name','f-email','f-special','f-msg','f-fcount','f-pname'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-ptype').value='';
+    selectedSeat=null; setFamily(false); setPerform(false); updateBadge();
+    document.getElementById('p4').classList.remove('visible');
+    step=1; document.getElementById('p1').classList.add('visible'); updateProgress(1);
+    btn.disabled=false;
+
+  } catch(err) {
+    document.getElementById('loader').classList.remove('show');
+    alert('提交失敗，請稍後再試。\n'+err.message);
+    btn.disabled=false;
+  }
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+buildMap();
+</script>
+</body>
+</html>
