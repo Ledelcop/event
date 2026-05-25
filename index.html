@@ -455,7 +455,7 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8zQ2yTIW__
 
 const ROW_LABELS = ['A','B','C','D'];
 const COLS = 11;
-const TAKEN_INIT = ['A-03','A-07','B-05','B-09','C-02','C-08','D-04'];
+const TAKEN_INIT = []; // 預設無已佔座位，可手動加入如 'A-03'
 
 let step = 1;
 let selectedSeat = null;
@@ -572,6 +572,41 @@ function buildReview() {
   </div>`).join('');
 }
 
+// 用隱藏 iframe + form 提交，繞過 CORS 限制
+function submitViaIframe(payload) {
+  return new Promise((resolve) => {
+    const iframeName = 'submit-iframe-' + Date.now();
+    const iframe = document.createElement('iframe');
+    iframe.name = iframeName;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = GOOGLE_SCRIPT_URL;
+    form.target = iframeName;
+
+    Object.entries(payload).forEach(([k, v]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = k;
+      input.value = v;
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
+      }, 500);
+      resolve();
+    };
+    setTimeout(resolve, 3000); // fallback
+    form.submit();
+  });
+}
+
 async function handleSubmit() {
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
@@ -584,15 +619,13 @@ async function handleSubmit() {
     performName: willPerform?val('f-pname'):'', specialNeeds: val('f-special'), message: val('f-msg'),
   };
 
+  const snap = { ...payload, hasFamily, willPerform };
+
   document.getElementById('loader').classList.add('show');
 
   try {
     if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      await submitViaIframe(payload);
     }
 
     const seatEl = document.querySelector(`.seat[data-id="${selectedSeat}"]`);
@@ -601,16 +634,16 @@ async function handleSubmit() {
     document.getElementById('loader').classList.remove('show');
 
     // Fill confirmation letter
-    document.getElementById('cl-name').textContent = payload.name;
-    document.getElementById('cl-seat').textContent = payload.seat;
-    document.getElementById('cl-reg-info').innerHTML = `
-      <div class="event-row"><span class="ev-label">姓　　名</span><span class="ev-val">${payload.name}</span></div>
-      <div class="event-row"><span class="ev-label">電子郵件</span><span class="ev-val">${payload.email}</span></div>
-      <div class="event-row"><span class="ev-label">座　　位</span><span class="ev-val highlight">${payload.seat}</span></div>
-      ${hasFamily ? `<div class="event-row"><span class="ev-label">家屬人數</span><span class="ev-val">${payload.familyCount} 人</span></div>` : ''}
-      ${willPerform ? `<div class="event-row"><span class="ev-label">表演節目</span><span class="ev-val">${payload.performType} · ${payload.performName}</span></div>` : ''}
-      ${payload.specialNeeds ? `<div class="event-row"><span class="ev-label">特殊需求</span><span class="ev-val">${payload.specialNeeds}</span></div>` : ''}
-    `;
+    document.getElementById('cl-name').textContent = snap.name;
+    document.getElementById('cl-seat').textContent = snap.seat;
+    document.getElementById('cl-reg-info').innerHTML =
+      '<div class="event-row"><span class="ev-label">姓\u3000\u3000名</span><span class="ev-val">' + snap.name + '</span></div>' +
+      '<div class="event-row"><span class="ev-label">電子郵件</span><span class="ev-val">' + snap.email + '</span></div>' +
+      '<div class="event-row"><span class="ev-label">座\u3000\u3000位</span><span class="ev-val highlight">' + snap.seat + '</span></div>' +
+      (snap.hasFamily ? '<div class="event-row"><span class="ev-label">家屬人數</span><span class="ev-val">' + snap.familyCount + ' 人</span></div>' : '') +
+      (snap.willPerform ? '<div class="event-row"><span class="ev-label">表演節目</span><span class="ev-val">' + snap.performType + ' · ' + snap.performName + '</span></div>' : '') +
+      (snap.specialNeeds ? '<div class="event-row"><span class="ev-label">特殊需求</span><span class="ev-val">' + snap.specialNeeds + '</span></div>' : '');
+
     document.getElementById('modal').classList.add('show');
 
     // Reset
